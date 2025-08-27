@@ -10,6 +10,11 @@ const ShopPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [sort, setSort] = useState(searchParams.get("ordering") || "-created_at");
 
+
+  const [page, setPage] = useState(parseInt(searchParams.get("page")) || 1);
+  const [pageSize, setPageSize] = useState(parseInt(searchParams.get("page_size")) || 10);
+  const [totalPages, setTotalPages] = useState(1);
+
   
   // Search state for suggestions
   const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
@@ -28,20 +33,30 @@ const ShopPage = () => {
       setLoading(true);
       const selectedCategory = searchParams.get("category") || "ALL";
       const currentSearchTerm = searchParams.get("search") || "";
-
+      const currentSort = searchParams.get("ordering") || "-created_at";
+      const currentPage = parseInt(searchParams.get("page")) || 1;
+      const currentPageSize = parseInt(searchParams.get("page_size")) || 1;
+      
       try {
         const productRes = await axios.get("http://127.0.0.1:8000/api/v1/products/?", {
           params: {
             category__name: selectedCategory === "ALL" ? "" : selectedCategory,
             search: currentSearchTerm,
-            ordering: searchParams.get("ordering") || "-created_at", 
+            ordering: currentSort,
+            page: currentPage,
+            page_size: currentPageSize,
 
           },
         });
         setProducts(productRes.data.results);
+        setTotalPages(productRes.data.total_pages || 1);
+        setPage(productRes.data.current_page || 1);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching products:", error);
         setProducts([]);
+        setTotalPages(1);
+
       } finally {
         setLoading(false);
       }
@@ -91,7 +106,31 @@ const ShopPage = () => {
     setSearchSuggestions([]);
   };
 
+    // Handlers
+  const updateSearchParams = (params) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    Object.keys(params).forEach((key) => {
+      if (params[key] === null || params[key] === "") {
+        newSearchParams.delete(key);
+      } else {
+        newSearchParams.set(key, params[key]);
+      }
+    });
+    setSearchParams(newSearchParams);
+  };
+
+  const handlePageChange = (newPage) => {
+    updateSearchParams({ page: newPage });
+  };
+
+  const handlePageSizeChange = (e) => {
+    const size = parseInt(e.target.value);
+    updateSearchParams({ page_size: size, page: 1 });
+  };
+
   const selectedCategoryFromUrl = searchParams.get("category") || "ALL";
+  const selectedPageSizeFromUrl = parseInt(searchParams.get("page_size")) || 3;
+
 
   return (
     <section className="bg-white py-16">
@@ -209,7 +248,34 @@ const ShopPage = () => {
             </p>
           </div>
         )}
+
+         {/* Page Numbers */}
+            {[...Array(totalPages)].map((_, idx) => {
+              const pageNum = idx + 1;
+              return (
+                <button
+                  key={pageNum}
+                  className={`px-3 py-1 rounded ${
+                    pageNum === page ? "bg-blue-500 text-white" : "bg-gray-100"
+                  }`}
+                  onClick={() => handlePageChange(pageNum)}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+
+            <button
+              disabled={page >= totalPages}
+              onClick={() => handlePageChange(page + 1)}
+              className="btn"
+            >
+              Next
+            </button>
+
+    
       </div>
+
     </section>
   );
 };
