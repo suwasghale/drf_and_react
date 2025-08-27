@@ -8,6 +8,8 @@ const ShopPage = () => {
   const [categories, setCategories] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sort, setSort] = useState(searchParams.get("ordering") || "-created_at");
+
   
   // Search state for suggestions
   const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
@@ -32,6 +34,8 @@ const ShopPage = () => {
           params: {
             category__name: selectedCategory === "ALL" ? "" : selectedCategory,
             search: currentSearchTerm,
+            ordering: searchParams.get("ordering") || "-created_at", 
+
           },
         });
         setProducts(productRes.data.results);
@@ -137,6 +141,29 @@ const ShopPage = () => {
                 ))}
               </select>
             </div>
+
+            <div>
+  <label htmlFor="sort" className="label sr-only">Sort By</label>
+  <select
+    id="sort"
+    name="sort"
+    className="input"
+    value={sort}
+    onChange={(e) => {
+      const newSort = e.target.value;
+      setSort(newSort);
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("ordering", newSort);
+      setSearchParams(newSearchParams);
+    }}
+  >
+    <option value="-created_at">Most Recent</option>
+    <option value="created_at">Oldest</option>
+    <option value="price">Price: Low to High</option>
+    <option value="-price">Price: High to Low</option>
+  </select>
+</div>
+
           </div>
         </div>
 
