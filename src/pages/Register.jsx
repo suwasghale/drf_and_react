@@ -1,10 +1,24 @@
+import { useForm } from "react-hook-form";
 import Button from "../components/ui/Button";
+import axios from "axios";
 
 const RegisterForm = () => {
+  const {register, handleSubmit, formState:{errors, isSubmitting}} = useForm()
+  
+  const onSubmitForm = async data =>{
+        try{
+            const response = await axios.post(`http://127.0.0.1:8000/api/v1/users/register/`, data)
+            alert("user registered successfully!")
+        }
+        catch(err){
+          console.log(err)
+        }
+  }
+
   return (
     <div className="max-w-lg mx-auto bg-white p-8 rounded-2xl shadow mt-10">
       <h2 className="text-2xl font-bold text-slate-800 mb-6">Register</h2>
-      <form className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
         {/* First Name */}
         <div className="flex items-center gap-2">
           <div>
@@ -12,10 +26,11 @@ const RegisterForm = () => {
               First Name
             </label>
             <input
+            {...register('first_name')}
               className="input"
               type="text"
               id="firstName"
-              name="firstName"
+              name="first_name"
             />
           </div>
 
@@ -25,10 +40,11 @@ const RegisterForm = () => {
               Last Name
             </label>
             <input
+              {...register('last_name')}
               className="input"
               type="text"
               id="lastName"
-              name="lastName"
+              name="last_name"
             />
           </div>
         </div>
@@ -38,7 +54,9 @@ const RegisterForm = () => {
           <label className="label" htmlFor="email">
             Email
           </label>
-          <input className="input" type="email" id="email" name="email" />
+          <input
+          {...register('email')} 
+          className="input" type="email" id="email" name="email" />
         </div>
 
         {/* Username */}
@@ -46,7 +64,9 @@ const RegisterForm = () => {
           <label className="label" htmlFor="username">
             Username
           </label>
-          <input className="input" type="text" id="username" name="username" />
+          <input             
+          {...register('username')}
+          className="input" type="text" id="username" name="username" />
         </div>
 
         {/* Password */}
@@ -55,6 +75,7 @@ const RegisterForm = () => {
             Password
           </label>
           <input
+            {...register('password')}
             className="input"
             type="password"
             id="password"
@@ -63,7 +84,7 @@ const RegisterForm = () => {
         </div>
 
         {/* Confirm Password */}
-        <div>
+        {/* <div>
           <label className="label" htmlFor="confirmPassword">
             Confirm Password
           </label>
@@ -73,7 +94,7 @@ const RegisterForm = () => {
             id="confirmPassword"
             name="confirmPassword"
           />
-        </div>
+        </div> */}
 
         <Button type="submit" size="md" className="w-full mt-4">
           Register
