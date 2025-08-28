@@ -55,7 +55,9 @@ const Navbar = () => {
 
           {/* Right Side */}
           <div className="flex items-center space-x-3">
-            <Button variant="ghost">Login</Button>
+             <Link to='/login'>
+              <Button >Login</Button>
+            </Link>
             <Link to='/register'>
               <Button>Register</Button>
             </Link>

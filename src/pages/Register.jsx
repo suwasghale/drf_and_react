@@ -1,14 +1,19 @@
 import { useForm } from "react-hook-form";
 import Button from "../components/ui/Button";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const RegisterForm = () => {
-  const {register, handleSubmit, formState:{errors, isSubmitting}} = useForm()
+  const {register, handleSubmit, formState:{errors, isSubmitting}, reset} = useForm()
+
+  const navigate = useNavigate()
   
   const onSubmitForm = async data =>{
         try{
             const response = await axios.post(`http://127.0.0.1:8000/api/v1/users/register/`, data)
-            alert("user registered successfully!")
+            toast.success("user registered successfully!")
+            navigate('/login')
         }
         catch(err){
           console.log(err)
@@ -16,6 +21,11 @@ const RegisterForm = () => {
   }
 
   return (
+    <>
+    <Toaster
+  position="top-center"
+  reverseOrder={false}
+/>
     <div className="max-w-lg mx-auto bg-white p-8 rounded-2xl shadow mt-10">
       <h2 className="text-2xl font-bold text-slate-800 mb-6">Register</h2>
       <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
@@ -96,11 +106,14 @@ const RegisterForm = () => {
           />
         </div> */}
 
-        <Button type="submit" size="md" className="w-full mt-4">
-          Register
+        <Button disabled={isSubmitting} type="submit" size="md" className="w-full mt-4">
+          {isSubmitting?"Submitting": "Register"}
         </Button>
       </form>
     </div>
+
+        </>
+
   );
 };
 
