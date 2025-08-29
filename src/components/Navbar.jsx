@@ -6,11 +6,22 @@ import { Link, useNavigate } from "react-router-dom";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  console.log(user)
+
   const navigate = useNavigate()
 
   const handleSearch = ()=>{
     navigate(`/shop?search=${search}`)
   }
+
+  const handleLogout = ()=>{
+    localStorage.removeItem("user")
+    navigate("/login")
+  }
+
+  
 
 
 
@@ -21,7 +32,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="text-2xl font-bold text-slate-800">
-              ShopEase
+              S-Mart
             </Link>
           </div>
 
@@ -55,12 +66,23 @@ const Navbar = () => {
 
           {/* Right Side */}
           <div className="flex items-center space-x-3">
-             <Link to='/login'>
+            {
+              !user? (
+                <>
+                  <Link to='/login'>
               <Button >Login</Button>
             </Link>
             <Link to='/register'>
               <Button>Register</Button>
             </Link>
+                </>
+              )
+              :
+             (
+              <Button onClick={handleLogout}>Logout</Button>
+             )
+
+            }
 
             {/* Cart */}
             <button className="relative p-2 rounded-full hover:bg-slate-100 cursor-pointer">

@@ -14,6 +14,7 @@ const LoginForm = () => {
             const response = await axios.post(`http://127.0.0.1:8000/api/v1/users/login/`, data)
             console.log(response.data)
             toast.success("user login successfully!")
+            localStorage.setItem("user",JSON.stringify(response.data ))
             navigate('/')
         }
         catch (err) {
